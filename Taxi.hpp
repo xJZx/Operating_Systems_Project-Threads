@@ -12,7 +12,7 @@ private:
 	bool isRunning;
 
 	//variable: is taxi free
-	bool isBusy;
+	bool isAvailable;
 
 	thread taxiThread;
 
@@ -23,5 +23,9 @@ public:
 	void start();
 	void stop();
 	void drive();
+	bool checkAvailability();
+	void setIsBusy();
+	void pickUpClient();
+	int getTaxiID();
 
 };

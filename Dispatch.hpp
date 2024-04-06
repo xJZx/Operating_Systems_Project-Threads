@@ -8,9 +8,9 @@ using namespace std;
 
 class Dispatch {
 private:
-	// arrays storing all taxis and clients
-	vector<Taxi> taxis;
-	vector<Client> clients;
+	// arrays of pointers storing all pointers to taxis and clients
+	vector<Taxi*> taxis;
+	vector<Client*> clients;
 
 	bool isRunning;
 
@@ -23,6 +23,9 @@ public:
 
 	void controlLoop();
 
-	void sendTaxiToClient(Taxi, Client);
+	void sendTaxiToClient(Taxi*);
+
+	void addTaxi(Taxi*);
+	void addClient(Client*);
 
 };

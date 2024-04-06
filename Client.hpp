@@ -12,9 +12,10 @@ private:
 	thread clientThread;
 
 public:
-	Client();
+	Client(int clientID);
 
 	void start();
 	void stop();
 	void findTaxi();
+	int getClientID();
 };
