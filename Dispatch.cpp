@@ -20,11 +20,12 @@ void Dispatch::stop(){
 
 void Dispatch::controlLoop(){
 	while (isRunning) {
-
-		for(Taxi* taxi : taxis){
-			if(taxi->checkAvailability()){
-				if(clients.size() > 0){
-					sendTaxiToClient(taxi);
+		if(taxis.size() != 0) {
+			for (Taxi* taxi : taxis) {
+				if (taxi->checkAvailability()) {
+					if (clients.size() > 0) {
+						sendTaxiToClient(taxi);
+					}
 				}
 			}
 		}
