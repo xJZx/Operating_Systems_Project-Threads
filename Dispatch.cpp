@@ -2,6 +2,7 @@
 
 Dispatch::Dispatch(){
 	isRunning = false;
+	mtx = new mutex();
 }
 
 void Dispatch::start(){
@@ -19,6 +20,7 @@ void Dispatch::stop(){
 }
 
 void Dispatch::controlLoop(){
+	cout << this_thread::get_id << endl;
 	while (isRunning) {
 		if(taxis.size() != 0) {
 			for (Taxi* taxi : taxis) {
@@ -29,6 +31,7 @@ void Dispatch::controlLoop(){
 				}
 			}
 		}
+		this_thread::sleep_for(chrono::seconds(1));
 	}
 }
 
@@ -41,9 +44,17 @@ void Dispatch::sendTaxiToClient(Taxi* taxi){
 }
 
 void Dispatch::addTaxi(Taxi* taxi){
+	mtx->lock();
+
 	taxis.push_back(taxi);
+
+	mtx->unlock();
 }
 
 void Dispatch::addClient(Client* client){
+	//mtx->lock();
+
 	clients.push_back(client);
+
+	//mtx->unlock();
 }

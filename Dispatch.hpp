@@ -2,6 +2,7 @@
 #include <iostream>
 #include <thread>
 #include <vector>
+#include <mutex> 
 #include "Taxi.hpp"
 #include "Client.hpp"
 using namespace std;
@@ -15,6 +16,8 @@ private:
 	bool isRunning;
 
 	thread dispatchThread;
+
+	mutex* mtx;
 
 public:
 	Dispatch();

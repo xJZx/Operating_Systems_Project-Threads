@@ -24,6 +24,17 @@ void Taxi::drive(){
 	while (isRunning) {
 		cout << "Taxi " << taxiID << " is driving around..." << endl;
 		this_thread::sleep_for(chrono::seconds(2));
+		if (!isAvailable) {
+			srand(time(NULL));
+			// simulates time taxi is driving the client
+			int transportTime = 5 + (rand() % 5);
+			this_thread::sleep_for(chrono::seconds(transportTime));
+
+			cout << "Client has been dropped off by taxi: " << taxiID << "." << endl;
+
+			// taxi is free ;)
+			setIsBusy();
+		}
 	}
 	cout << "Taxi " << taxiID << " has stopped." << endl;
 }
@@ -38,16 +49,6 @@ void Taxi::setIsBusy() {
 
 void Taxi::pickUpClient() {
 	// taxi is busy with a client
-	setIsBusy();
-
-	srand(time(NULL));
-	// simulates time taxi is driving the client
-	int transportTime = 5 + (rand() % 5);
-	this_thread::sleep_for(chrono::seconds(transportTime));
-
-	cout << "Client has been dropped off by taxi: " << taxiID << "." << endl;
-
-	// taxi is free
 	setIsBusy();
 }
 
