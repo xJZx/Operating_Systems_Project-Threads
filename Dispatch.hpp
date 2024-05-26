@@ -31,4 +31,12 @@ public:
 	void addTaxi(Taxi*);
 	void addClient(Client*);
 
+	vector<Taxi*> getTaxis() {
+		return taxis;
+	}
+
+	vector<Client*> getClients() {
+		return clients;
+	}
+
 };

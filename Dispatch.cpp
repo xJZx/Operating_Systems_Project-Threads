@@ -20,8 +20,9 @@ void Dispatch::stop(){
 }
 
 void Dispatch::controlLoop(){
-	cout << this_thread::get_id << endl;
+	//cout << this_thread::get_id << endl;
 	while (isRunning) {
+		mtx->lock();
 		if(taxis.size() != 0) {
 			for (Taxi* taxi : taxis) {
 				if (taxi->checkAvailability()) {
@@ -31,16 +32,21 @@ void Dispatch::controlLoop(){
 				}
 			}
 		}
-		this_thread::sleep_for(chrono::seconds(1));
+		mtx->unlock();
+		//this_thread::sleep_for(chrono::seconds(1));
 	}
 }
 
 void Dispatch::sendTaxiToClient(Taxi* taxi){
+	//mtx->lock();
+
 	taxi->start();
 	cout << "Client " << clients.front()->getClientID() << " has been collected by taxi ID: " << taxi->getTaxiID() << "." << endl;
 	clients.front()->stop();
 	clients.erase(clients.begin());
 	taxi->pickUpClient();
+
+	//mtx->unlock();
 }
 
 void Dispatch::addTaxi(Taxi* taxi){
@@ -52,9 +58,9 @@ void Dispatch::addTaxi(Taxi* taxi){
 }
 
 void Dispatch::addClient(Client* client){
-	//mtx->lock();
+	mtx->lock();
 
 	clients.push_back(client);
 
-	//mtx->unlock();
+	mtx->unlock();
 }
