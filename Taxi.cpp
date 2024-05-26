@@ -22,7 +22,7 @@ void Taxi::stop(){
 
 void Taxi::drive(){
 	while (isRunning) {
-		cout << "Taxi " << taxiID << " is driving around..." << endl;
+		cout << "Taxi " << taxiID << " is waiting for dispatch..." << endl;
 		this_thread::sleep_for(chrono::seconds(2));
 		if (!isAvailable) {
 			srand(time(NULL));
