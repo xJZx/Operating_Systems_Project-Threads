@@ -51,6 +51,42 @@ int main(){
 
 			break;
 		}
+
+		if (GetKeyState('A') & 0x8000) { // jak achtung...
+			mtx->lock();
+
+			cout << "Nadchodzi mg³a..." << endl;
+
+			this_thread::sleep_for(chrono::milliseconds(200));
+
+			vector<Taxi*> taxis = dispatch.getTaxis();
+
+			bool clientsDelivered = false;
+
+			while (!clientsDelivered) {
+				for (int i = 0; i < taxis.size(); i++) {
+					if (taxis[i]->checkAvailability() == true) {
+						break;
+					}
+					if(i == (taxis.size() - 1)) {
+						clientsDelivered = true;
+					}
+				}
+			}
+
+			while(true){
+				// a mg³a siê unosi...
+				if (GetKeyState('A') & 0x8000) {
+					break;
+				}
+			}
+
+			cout << "Koniec mg³y... ale czy aby na pewno...?" << endl;
+
+			mtx->unlock();
+		}
+
+
 		this_thread::sleep_for(chrono::milliseconds(200));
 	}
 
