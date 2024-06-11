@@ -3,6 +3,7 @@
 Dispatch::Dispatch(){
 	isRunning = false;
 	mtx = new mutex();
+	isFog = false;
 }
 
 void Dispatch::start(){
@@ -27,7 +28,9 @@ void Dispatch::controlLoop(){
 			for (Taxi* taxi : taxis) {
 				if (taxi->checkAvailability()) {
 					if (clients.size() > 0) {
-						sendTaxiToClient(taxi);
+						if (!isFog) {
+							sendTaxiToClient(taxi);
+						}
 					}
 				}
 			}
@@ -39,9 +42,9 @@ void Dispatch::controlLoop(){
 
 void Dispatch::sendTaxiToClient(Taxi* taxi){
 	//mtx->lock();
-
 	taxi->start();
-	cout << "Client " << clients.front()->getClientID() << " has been collected by taxi ID: " << taxi->getTaxiID() << "." << endl;
+	taxi->setClientID(clients.front()->getClientID());
+	//cout << "Client " << clients.front()->getClientID() << " has been collected by taxi ID: " << taxi->getTaxiID() << "." << endl;
 	clients.front()->stop();
 	clients.erase(clients.begin());
 	taxi->pickUpClient();
@@ -63,4 +66,8 @@ void Dispatch::addClient(Client* client){
 	clients.push_back(client);
 
 	mtx->unlock();
+}
+
+void Dispatch::setIsFog() {
+	isFog = !isFog;
 }

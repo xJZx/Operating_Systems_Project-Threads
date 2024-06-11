@@ -1,39 +1,42 @@
 #include "Taxi.hpp"
 #include "Client.hpp"
 #include "Dispatch.hpp"
+#include "UserInterface.h"
 #include <chrono>
 #include <windows.h>
-#include <mutex> 
+#include <mutex>
 using namespace std;
 
 int main(){
 
 	mutex* mtx = new mutex();
 
-	Dispatch dispatch = Dispatch();
-	dispatch.start();
+	Dispatch* dispatch = new Dispatch();
+	dispatch->start();
 
 	int taxiID = 0;
 	int clientID = 0;
 
+	UserInterface* userInterface = new UserInterface(dispatch);
+	userInterface->start();
+
 	while (true) {
 		if (GetKeyState('T') & 0x8000) {
 			Taxi* taxi = new Taxi(taxiID);
-			dispatch.addTaxi(taxi);
-			cout << "Taxi with id: " << taxiID << " added!" << endl;
+			dispatch->addTaxi(taxi);
 			taxiID++;
 		}
 		if (GetKeyState('C') & 0x8000) {
 			Client* client = new Client(clientID);
 			client->start();
-			dispatch.addClient(client);
+			dispatch->addClient(client);
 			clientID++;
 		}
 		if (GetKeyState('Q') & 0x8000) {
 			mtx->lock();
 
-			vector<Taxi*> taxis = dispatch.getTaxis();
-			vector<Client*> clients = dispatch.getClients();
+			vector<Taxi*> taxis = dispatch->getTaxis();
+			vector<Client*> clients = dispatch->getClients();
 
 			for(int i = 0; i < taxis.size(); i++){
 				taxis[i]->stop();
@@ -43,7 +46,8 @@ int main(){
 				clients[i]->stop();
 			}
 
-			dispatch.stop();
+			dispatch->stop();
+			userInterface->stop();
 
 			mtx->unlock();
 
@@ -52,20 +56,21 @@ int main(){
 			break;
 		}
 
-		if (GetKeyState('A') & 0x8000) { // jak achtung...
+		if (GetKeyState('A') & 0x8000) { // as attention...
+			//inform dispatcher about bad weather
+			userInterface->setIsFog();
+			dispatch->setIsFog();
 			mtx->lock();
 
-			cout << "Nadchodzi mg³a..." << endl;
+			//this_thread::sleep_for(chrono::milliseconds(200));
 
-			this_thread::sleep_for(chrono::milliseconds(200));
-
-			vector<Taxi*> taxis = dispatch.getTaxis();
+			vector<Taxi*> taxis = dispatch->getTaxis();
 
 			bool clientsDelivered = false;
 
 			while (!clientsDelivered) {
 				for (int i = 0; i < taxis.size(); i++) {
-					if (taxis[i]->checkAvailability() == true) {
+					if (taxis[i]->checkAvailability() == false) {
 						break;
 					}
 					if(i == (taxis.size() - 1)) {
@@ -75,15 +80,16 @@ int main(){
 			}
 
 			while(true){
-				// a mg³a siê unosi...
-				if (GetKeyState('A') & 0x8000) {
+				// fog is floating...
+				if (GetAsyncKeyState('A') & 0x8000) {
 					break;
 				}
 			}
 
-			cout << "Koniec mg³y... ale czy aby na pewno...?" << endl;
-
 			mtx->unlock();
+			//inform about good weather
+			dispatch->setIsFog();
+			userInterface->setIsFog();
 		}
 
 
