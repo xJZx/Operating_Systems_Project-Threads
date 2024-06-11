@@ -16,6 +16,7 @@ private:
 	bool isFog;
 	void print();
 	Dispatch* dispatch;
+	mutex* mtx;
 
 public:
 	UserInterface(Dispatch*);

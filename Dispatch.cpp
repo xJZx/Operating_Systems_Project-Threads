@@ -1,73 +1,89 @@
 #include "Dispatch.hpp"
 
-Dispatch::Dispatch(){
+Dispatch::Dispatch() {
 	isRunning = false;
-	mtx = new mutex();
 	isFog = false;
 }
 
-void Dispatch::start(){
+void Dispatch::start() {
 	if (!isRunning) {
 		isRunning = true;
-		dispatchThread = thread(&Dispatch::controlLoop, this);
+		dispatchThread = std::thread(&Dispatch::controlLoop, this);
 	}
 }
 
-void Dispatch::stop(){
+void Dispatch::stop() {
 	if (isRunning) {
-		isRunning = false;
+		{
+			std::lock_guard<std::mutex> lock(mtx);
+			isRunning = false;
+		}
+
+		// unblocks the conditional variable in control loop
+		cvFog.notify_all();
+
 		dispatchThread.join();
+
+		// just cleaning...
+		std::lock_guard<std::mutex> lock(mtx);
+
+		for (auto client : clients) {
+			delete client;
+		}
+		clients.clear();
+
+		for (auto taxi : taxis) {
+			delete taxi;
+		}
+		taxis.clear();
 	}
 }
 
-void Dispatch::controlLoop(){
-	//cout << this_thread::get_id << endl;
+void Dispatch::controlLoop() {
 	while (isRunning) {
-		mtx->lock();
-		if(taxis.size() != 0) {
-			for (Taxi* taxi : taxis) {
-				if (taxi->checkAvailability()) {
-					if (clients.size() > 0) {
-						if (!isFog) {
-							sendTaxiToClient(taxi);
-						}
-					}
-				}
+		std::unique_lock<std::mutex> lock(mtx);
+
+		// conditional variable
+		cvFog.wait(lock, [this] { return !isFog || !isRunning; });
+
+		if (!isRunning) break;
+
+		for (Taxi* taxi : taxis) {
+			if (taxi->checkAvailability() && !clients.empty()) {
+				sendTaxiToClient(taxi);
 			}
 		}
-		mtx->unlock();
-		//this_thread::sleep_for(chrono::seconds(1));
+
+		lock.unlock();
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 }
 
-void Dispatch::sendTaxiToClient(Taxi* taxi){
-	//mtx->lock();
+void Dispatch::sendTaxiToClient(Taxi* taxi) {
 	taxi->start();
 	taxi->setClientID(clients.front()->getClientID());
-	//cout << "Client " << clients.front()->getClientID() << " has been collected by taxi ID: " << taxi->getTaxiID() << "." << endl;
 	clients.front()->stop();
+	// cleaning...
+	delete clients.front();
 	clients.erase(clients.begin());
 	taxi->pickUpClient();
-
-	//mtx->unlock();
 }
 
-void Dispatch::addTaxi(Taxi* taxi){
-	mtx->lock();
-
+void Dispatch::addTaxi(Taxi* taxi) {
+	std::lock_guard<std::mutex> lock(mtx);
 	taxis.push_back(taxi);
-
-	mtx->unlock();
 }
 
-void Dispatch::addClient(Client* client){
-	mtx->lock();
-
+void Dispatch::addClient(Client* client) {
+	std::lock_guard<std::mutex> lock(mtx);
 	clients.push_back(client);
-
-	mtx->unlock();
 }
 
 void Dispatch::setIsFog() {
-	isFog = !isFog;
+	{
+		std::lock_guard<std::mutex> lock(mtx);
+		isFog = !isFog;
+	}
+	// unblocks the conditional variable in control loop
+	cvFog.notify_all();
 }

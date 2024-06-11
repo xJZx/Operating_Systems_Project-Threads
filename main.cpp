@@ -38,18 +38,22 @@ int main(){
 			vector<Taxi*> taxis = dispatch->getTaxis();
 			vector<Client*> clients = dispatch->getClients();
 
-			for(int i = 0; i < taxis.size(); i++){
-				taxis[i]->stop();
-			}
+			mtx->unlock();
 
 			for (int i = 0; i < clients.size(); i++) {
 				clients[i]->stop();
 			}
 
-			dispatch->stop();
-			userInterface->stop();
+			// dispatch->getClients().clear();
 
-			mtx->unlock();
+			for(int i = 0; i < taxis.size(); i++){
+				taxis[i]->stop();
+			}
+
+			// dispatch->getTaxis().clear();
+
+			userInterface->stop();
+			dispatch->stop();
 
 			cout << "The programme has stopped!" << endl;
 
@@ -87,7 +91,7 @@ int main(){
 			}
 
 			mtx->unlock();
-			//inform about good weather
+			// inform about good weather
 			dispatch->setIsFog();
 			userInterface->setIsFog();
 		}

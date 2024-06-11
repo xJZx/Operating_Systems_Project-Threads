@@ -4,6 +4,7 @@ UserInterface::UserInterface(Dispatch* dispatch) {
 	isRunning = false;
 	isFog = false;
 	this->dispatch = dispatch;
+	mtx = new mutex();
 }
 
 void UserInterface::start() {
@@ -16,6 +17,7 @@ void UserInterface::start() {
 void UserInterface::print() {
 	while (isRunning) {
 		//print parking
+		mtx->lock();
 		vector<Taxi*> taxis = dispatch->getTaxis();
 		vector<Client*> clients = dispatch->getClients();
 		system("CLS");
@@ -71,6 +73,7 @@ void UserInterface::print() {
 		if (isFog) {
 			cout << "Fog..." << endl;
 		}
+		mtx->unlock();
 	}
 }
 

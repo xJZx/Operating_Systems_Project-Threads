@@ -16,7 +16,8 @@ private:
 	bool isRunning;
 
 	thread dispatchThread;
-	mutex* mtx;
+	mutex mtx;
+    condition_variable cvFog;
 
 	bool isFog;
 
