@@ -23,11 +23,13 @@
     <ClCompile Include="Dispatch.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Taxi.cpp" />
+    <ClCompile Include="UserInterface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.hpp" />
     <ClInclude Include="Dispatch.hpp" />
     <ClInclude Include="Taxi.hpp" />
+    <ClInclude Include="UserInterface.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
