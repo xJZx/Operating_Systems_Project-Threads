@@ -21,8 +21,8 @@ void Client::stop(){
 
 void Client::findTaxi(){
 	while (isRunning) {
-		cout << "Client " << clientID << " is seeking taxi..." << endl;
-		//this_thread::sleep_for(chrono::seconds(3));
+		//cout << "Client " << clientID << " is seeking taxi..." << endl;
+		// this_thread::sleep_for(chrono::seconds(3));
 	}
 }
 

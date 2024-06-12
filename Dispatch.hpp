@@ -16,8 +16,10 @@ private:
 	bool isRunning;
 
 	thread dispatchThread;
+	mutex mtx;
+    condition_variable cvFog;
 
-	mutex* mtx;
+	bool isFog;
 
 public:
 	Dispatch();
@@ -30,6 +32,7 @@ public:
 
 	void addTaxi(Taxi*);
 	void addClient(Client*);
+	void setIsFog();
 
 	vector<Taxi*> getTaxis() {
 		return taxis;
