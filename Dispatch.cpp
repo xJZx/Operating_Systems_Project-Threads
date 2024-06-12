@@ -26,14 +26,8 @@ void Dispatch::stop() {
 		// just cleaning...
 		std::lock_guard<std::mutex> lock(mtx);
 
-		for (auto client : clients) {
-			delete client;
-		}
 		clients.clear();
 
-		for (auto taxi : taxis) {
-			delete taxi;
-		}
 		taxis.clear();
 	}
 }

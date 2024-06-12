@@ -83,7 +83,7 @@ int main(){
 
 			while(true){
 				// fog is floating...
-				if (GetAsyncKeyState('A') & 0x8000) {
+				if (GetKeyState('A') & 0x8000) {
 					break;
 				}
 			}
